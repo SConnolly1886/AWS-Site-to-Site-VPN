@@ -16,6 +16,9 @@ A simulated on-prem environment will have the following:
 - 2 private subnets
 - 2 ubuntu routers (Strongswan) that you will connect through via VPN endpoints
 
+![image](https://user-images.githubusercontent.com/62077185/124508816-9936aa80-dd9e-11eb-9c68-8675b55b5402.png)
+
+
 ## Setting up the environments
 
 Use the cloudformation templates to set up the respective environments
