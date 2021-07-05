@@ -14,7 +14,7 @@ The AWS environment will have the following:
 A simulated on-prem environment will have the following:
 - 1 public subnet
 - 2 private subnets
-- 2 ubuntu routers (Strongswan) that you will connect through via VPN endpoints
+- 2 ubuntu routers with Strongswan (Router1 and Router2) that you will connect through via VPN endpoints
 
 ![image](https://user-images.githubusercontent.com/62077185/124508816-9936aa80-dd9e-11eb-9c68-8675b55b5402.png)
 
@@ -22,49 +22,51 @@ A simulated on-prem environment will have the following:
 ## Setting up the environments
 
 Use the cloudformation templates to set up the respective environments
--AWSenv
--ONPREMenv
+-S2SVPN-AWS
+-S2SVPN-ON-P
 
-This should take a few minutes to set everything up...
+As usual wait out the setup...
 
 ## Router IPs
 
-When setting up a site-to-site VPN you must make note of the IP address for the on-site public facing routers.
+When setting up a site-to-site VPN you must make note of the IP address for the on-prem side of things. You will need the IP for the Router(s) as well as the internal CIDR that you intend to connect via VPN. 
 
-In this example they can be found as outputs `Router1Public` and `Router2Public`
+In this example the routers IP's can be found as outputs: `Router1Public` and `Router2Public`
 
-## Creating On-prem Customer Gateways
+## Creating On-prem Customer Gateways (CGW)
+In this example there are 2 on-premises routers therefore 2 customer gateways are required.
 
-### Set up On-prem router 1
-Select `Customer Gateways` under `Virtual private Network (VPN)` and create a CGW
-Set the name of the CGW as `ONPREM-ROUTER1` and click `Dynamic` for routing  
-Set BGP ASN to `65016` 
-Set IP Address to Router1PubIP  
-Click `create Customer gateway`  
+### How do you set up a CGW for Router1?
+-Select `Customer Gateways` under `Virtual private Network (VPN)` and create a CGW
+-Set the name of the CGW as `ROUTER1` and click `Dynamic` for routing  
+-Set BGP ASN to `65016` 
+-Set IP Address to Router1PubIP (The public IP for Router1)  
+-create `Customer gateway`  
 
 Note: You can set a private BGP ASN in the range of `64512 to 65535`
   
-### Set up On-prem router 2
-Select `Customer Gateways` under `Virtual private Network (VPN)`  and create a CGW
-Set the name of the CGW as `ONPREM-ROUTER2` and click `Dynamic` for routing  
-Set BGP ASN to `65016` 
-Set IP Address to Router2PubIP  
-Click `create Customer gateway`  
+### How do you set up a CGW for Router2?
+That's right, it's the same as Router1. So just repeat the steps:
+-Select `Customer Gateways` under `Virtual private Network (VPN)`  and create a CGW
+-Set the name of the CGW as `ROUTER2` and click `Dynamic` for routing  
+-Set BGP ASN to `65016` (the same as Router1)
+-Set IP Address to Router2PubIP (The public IP for Router2)     
+-create `Customer gateway`  
 
 ## CONFIRM THERE IS STILL NO CONNECTIVITY
 Select `ONPREM-SERVER2` EC2 instance and connect to it through SSM Session Manager and try pinging EC2-B `ping IP_ADDRESS_OF_EC2-B`  
-It won't work yet...more to do
+It won't work yet...there's still more to do
 
 ## Next step
-Now 2 vpn attachments need to be created for the TGW. In essence its creating 2 vpn connections, 1 for each of the customer gateways in the on-prem environment. Each vpn connection has 2 tunnels for each AWS Endpoint pointing to the on-prem router.
+Now 2 vpn attachments need to be created for the Transit Gateway (TGW). In essence its creating 2 vpn connections, 1 for each of the customer gateways in the on-prem environment. Each vpn connection has 2 tunnels for each AWS Endpoint pointing to the on-prem router.
 This step is needed in order to download the config files (for configuring on-prem VPN endpoints)
 
 ### Create the VPN Attacments for TGW
 
-In AWS, navigatw to TGW attacments and create a TGW attacment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
+In AWS, navigate to TGW attachments and create a TGW attacment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
 -Attacment type: `VPN`
 -`Customer gateway`: `Existing`
--`Customer gateway ID` : `ONPREM-ROUTER1`
+-`Customer gateway ID` : `ROUTER1`
 -`Routing options` : `Dynamic`
 -`Enable Acceleration`
 -`Create Attachment`
@@ -72,7 +74,7 @@ In AWS, navigatw to TGW attacments and create a TGW attacment. For transit gatew
 `Create Transit Gateway Attachment`
 `Transit Gateway ID` : `AWSTGW`
 -Attacment type: `VPN`
--`Customer gateway`: `Ex-`Customer gateway ID` : `ONPREM-ROUTER2`
+-`Customer gateway`: `Ex-`Customer gateway ID` : `ROUTER2`
 -`Routing options` : `Dynamic`
 -`Enable Acceleration`
 -`Create Attachment`
@@ -80,7 +82,7 @@ In AWS, navigatw to TGW attacments and create a TGW attacment. For transit gatew
 ## Site-to-Site VPN
 Move to `Site-to-Site VPN Connections` under `Virtual Private Network`
 
-For each of the connections, it will show you the `Customer Gateway Address` these match `ONPREM-ROUTER1 Public` and `ONPREM-ROUTER2 Public`
+For each of the connections, it will show you the `Customer Gateway Address` these match `ROUTER1 Public` and `ROUTER2 Public`
 
 -Select the line which matches Router1PubIP and `Download Configuration`
 -Change vendor to `Generic` (Note select appropriate vendor if found, default to generic if need be)
@@ -99,9 +101,9 @@ Now the on-prem routers need to be configured so lets create IPSEC tunnels to th
 
 Make sure before starting this stage that both VPN connections are in an `available` state. Check your AWS console to verify.
 
-### CONFIGURE IPSEC TUNNELS FOR ONPREMISES-ROUTER1
+### CONFIGURE IPSEC TUNNELS FOR ROUTER1
 
-Select the EC2 instance named `ONPREM-ROUTER1` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER1` and connect via SSM Session Manager
 
 Once connected run:
 - `sudo bash`  
@@ -165,9 +167,9 @@ You should see `vti1` and `vti2` interfaces
 You can also check the connection in the AWS VPC Console ...the tunnels should be down, but IPSEC should be shown as UP after a few minutes.  
 
 
-# CONFIGURE IPSEC TUNNELS FOR ONPREMISES-ROUTER2
+# CONFIGURE IPSEC TUNNELS FOR ROUTER2
 
-Select the EC2 instance named `ONPREM-ROUTER2` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER2` and connect via SSM Session Manager
 
 Once connected run:
 `sudo bash`  
@@ -240,7 +242,7 @@ Once routes are exchanged, the connections will allow data to flow between AWS a
 BGP capability is added using `FRR` and that will be installed on the on-prem routers.  
 
 ## INSTALL FRR ON ROUTER 1 (BGP CAPABILITY)
-Select the EC2 instance named `ONPREM-ROUTER1` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER1` and connect via SSM Session Manager
 
 First we will make the `FRR` script executable and run it to install BGP capability.  
 `sudo bash`  
@@ -252,14 +254,14 @@ First we will make the `FRR` script executable and run it to install BGP capabil
 
 ## INSTALL FRR ON ROUTER 2 (BGP CAPABILITY)
 
-Select the EC2 instance named `ONPREM-ROUTER2` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER2` and connect via SSM Session Manager
 
 `sudo bash`  
 `cd /home/ubuntu/demo_assets`  
 `chmod +x ffrouting-install.sh`     
 `./ffrouting-install.sh`  
 
-# CONFIGURE BGP ROUTING FOR ONPREMISES-ROUTER1 AND TEST
+# CONFIGURE BGP ROUTING FOR ROUTER1 AND TEST
 
 `vtysh`  
 `conf t`  
@@ -279,9 +281,9 @@ Select the EC2 instance named `ONPREM-ROUTER2` and connect via SSM Session Manag
 `sudo reboot`  
 
 
-`ONPREM-ROUTER1` once back will now be functioning as both an IPSEC endpoint and a BGP endpoint. It will be exchanging routes with the transit gateway in AWS.  
+`ROUTER1` once back will now be functioning as both an IPSEC endpoint and a BGP endpoint. It will be exchanging routes with the transit gateway in AWS.  
 
-Select the EC2 instance named `ONPREM-ROUTER1` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER1` and connect via SSM Session Manager
 
 `sudo bash`
 `sudo chmod 740 /var/run/frr && systemctl restart frr`
@@ -296,7 +298,7 @@ Select the EC2 instance named `EC2-A`  and connect via SSM Session Manager
 run `ping IP_ADDRESS_OF_ONPREM-SERVER1`  
 
 
-# CONFIGURE BGP ROUTING FOR ONPREMISES-ROUTER2 AND TEST
+# CONFIGURE BGP ROUTING FOR ROUTER2 AND TEST
 
 `vtysh`  
 `conf t`  
@@ -315,10 +317,10 @@ run `ping IP_ADDRESS_OF_ONPREM-SERVER1`
 
 `sudo reboot`  
 
-`ONPREM-ROUTER2` once back will now be functioning as both an IPSEC endpoint and a BGP endpoint. It will be exchanging routes with the transit gateway in AWS.  
+`ROUTER2` once back will now be functioning as both an IPSEC endpoint and a BGP endpoint. It will be exchanging routes with the transit gateway in AWS.  
 `EC2-A` 
 
-Select the EC2 instance named `ONPREM-ROUTER1` and connect via SSM Session Manager
+Select the EC2 instance named `ROUTER1` and connect via SSM Session Manager
 
 `sudo bash`     
 `sudo chmod 740 /var/run/frr && systemctl restart frr` (this is a very temp workaround until i fix a bug - FRR won't start all daemons because the /var/run/frr is created with 640 permissions.. it needs to be 740).
@@ -337,6 +339,5 @@ run `ping IP_ADDRESS_OF_ONPREM-SERVER2`
 
 And it's as easy as that. In a few steps its easy to create a dynamic VPN connection between your on-prem and AWS environments! Enjoy your connectivity!
 
-
-
+Check out the offical documentation for an alternative way of learning https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html
 
