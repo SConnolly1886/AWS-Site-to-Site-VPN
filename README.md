@@ -60,12 +60,12 @@ Select `ONPREM-SERVER2` EC2 instance and connect to it through SSM Session Manag
 It won't work yet...there's still more to do
 
 ## Next step
-Now 2 vpn attachments need to be created for the Transit Gateway (TGW). In essence its creating 2 vpn connections, 1 for each of the customer gateways in the on-prem environment. Each vpn connection has 2 tunnels for each AWS Endpoint pointing to the on-prem router.
+Now 2 vpn attachments need to be created for the Transit Gateway (TGW). In essence it's creating 2 vpn connections, 1 for each of the customer gateways in the on-prem environment. Each vpn connection has 2 tunnels for each AWS Endpoint pointing to the on-prem router.
 This step is needed in order to download the config files (for configuring on-prem VPN endpoints)
 
 ### Create the VPN Attacments for TGW
 
-In AWS, navigate to TGW attachments and create a TGW attacment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
+In AWS, navigate to TGW attachments and create a TGW attachment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
 
 ![createtransattach](https://user-images.githubusercontent.com/62077185/124516484-bc1d8a80-ddaf-11eb-8824-ea7e36ce22f0.JPG)
 
@@ -102,7 +102,7 @@ For each of the connections, it will show you the `Customer Gateway Address` the
 Great! Now the config files are available. This will allow us to set up the VPN Connection now.
 
 ## Configure the On-prem Ubuntu, Strongswan routers
-Now the on-prem routers need to be configured so lets create IPSEC tunnels to the AWS environment. For each on-prem router you should create 2 IPSEC tunnels ... each going to a different AWS Endpoint. 
+Now the on-prem routers need to be configured so let's create IPSEC tunnels to the AWS environment. For each on-prem router you should create 2 IPSEC tunnels ... each going to a different AWS Endpoint. 
 
 Make sure before starting this stage that both VPN connections are in an `available` state. Check your AWS console to verify.
 
@@ -161,7 +161,7 @@ Save and exit
 `cp ipsec* /etc`  
 `chmod +x /etc/ipsec-vti.sh`  
 
-Now all the configuration for Router1 IPSEC has been completed, lets restart the strongSwan service to bring them up.  
+Now all the configuration for Router1 IPSEC has been completed, let's restart the strongSwan service to bring them up.  
 
 `systemctl restart strongswan` to restart strongSwan ... this should bring up the tunnels  
 
@@ -226,7 +226,7 @@ Save and exit
 `cp ipsec* /etc`  
 `chmod +x /etc/ipsec-vti.sh`  
 
-Now all the configuration for Router1 IPSEC has been completed, lets restart the strongSwan service to bring them up.  
+Now all the configuration for Router1 IPSEC has been completed, let's restart the strongSwan service to bring them up.  
 
 `systemctl restart strongswan` to restart strongSwan ... this should bring up the tunnels  
 
@@ -237,9 +237,9 @@ You can also check the connection in the AWS VPC Console ...the tunnels should b
 
 ### IPSEC check
 
-When all 4 IPSEC TUNNELS are up (`vti1`,`vti2`,`Router1` and `Router2`) there still shouldn't be any connectivity. Next, lets add BGP capability with the dynamic BGP connections.
+When all 4 IPSEC TUNNELS are up (`vti1`,`vti2`,`Router1` and `Router2`) there still shouldn't be any connectivity. Next, let's add BGP capability with the dynamic BGP connections.
 
-In this next step, lets use the IPSEC tunnels created earlier and add BGP sessions for all of the tunnels created.  
+In this next step, let's use the IPSEC tunnels created earlier and add BGP sessions for all of the tunnels created.  
 These sessions will allow the ONPREM Routers to exchange routers with the Transit Gateway running in AWS  
 Once routes are exchanged, the connections will allow data to flow between AWS and ONPREMISES  
 BGP capability is added using `FRR` and that will be installed on the on-prem routers.  
@@ -340,7 +340,7 @@ run `ping IP_ADDRESS_OF_ONPREM-SERVER2`
 
 # Finished!
 
-And it's as easy as that. In a few steps its easy to create a dynamic VPN connection between your on-prem and AWS environments! Enjoy your connectivity!
+And it's as easy as that. In a few steps it's easy to create a dynamic VPN connection between your on-prem and AWS environments! Enjoy your connectivity!
 
 Check out the offical documentation for an alternative way of learning https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html
 
