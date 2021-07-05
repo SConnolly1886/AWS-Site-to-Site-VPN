@@ -43,6 +43,8 @@ In this example there are 2 on-premises routers therefore 2 customer gateways ar
 -Set IP Address to Router1PubIP (The public IP for Router1)  
 -create `Customer gateway`  
 
+![selectcustomergateway](https://user-images.githubusercontent.com/62077185/124516464-b2942280-ddaf-11eb-9809-9ba72aaffa1e.JPG)
+
 Note: You can set a private BGP ASN in the range of `64512 to 65535`
   
 ### How do you set up a CGW for Router2?
@@ -64,6 +66,9 @@ This step is needed in order to download the config files (for configuring on-pr
 ### Create the VPN Attacments for TGW
 
 In AWS, navigate to TGW attachments and create a TGW attacment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
+
+![createtransattach](https://user-images.githubusercontent.com/62077185/124516484-bc1d8a80-ddaf-11eb-8824-ea7e36ce22f0.JPG)
+
 -Attacment type: `VPN`
 -`Customer gateway`: `Existing`
 -`Customer gateway ID` : `ROUTER1`
