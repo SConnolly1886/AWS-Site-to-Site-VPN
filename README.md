@@ -340,7 +340,7 @@ run `ping IP_ADDRESS_OF_ONPREM-SERVER2`
 
 # Finished!
 
-And it's as easy as that. In a few steps it's easy to create a dynamic VPN connection between your on-prem and AWS environments! Enjoy your connectivity!
+And it's as easy as that! In a few steps you've created a dynamic VPN connection between your on-premises and AWS environments. Enjoy your connectivity.
 
 Check out the offical documentation for an alternative way of learning https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html
 
