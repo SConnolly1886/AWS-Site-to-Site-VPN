@@ -1,6 +1,8 @@
 
 # AWS Site-to-Site VPN with Dynamic Routing
 
+![HAVPN](https://user-images.githubusercontent.com/62077185/125100445-1ae04e00-e0a7-11eb-9ee4-b9d3bdc0d7fe.png)
+
 Setting up a VPN can be complicated at times but AWS tries to simplify the process as much as they can. Below you'll see the steps to create a highly available site-to-site VPN connection with Border Gateway Protocal (BGP) dynamic routing.
 
 ### What will be created
