@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: 2010-09-09
 Description:  AWS Site-to-Site VPN with Simulated on-prem env
 Parameters:
   LatestAmiId:
