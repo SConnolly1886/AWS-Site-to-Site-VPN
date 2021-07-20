@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: 2010-09-09
 Description:  AWS Site-to-Site VPN - MUST be applied in us-east-1 // ONPREMISES SIMULATED ENVIRONMENT
 Parameters:
   LatestAmiId:
