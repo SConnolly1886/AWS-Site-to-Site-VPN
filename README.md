@@ -3,7 +3,7 @@
 
 ![HAVPN](https://user-images.githubusercontent.com/62077185/125100445-1ae04e00-e0a7-11eb-9ee4-b9d3bdc0d7fe.png)
 
-Setting up a VPN can be complicated at times but AWS tries to simplify the process as much as they can. Below you'll see the steps to create a highly available site-to-site VPN connection with Border Gateway Protocal (BGP) dynamic routing.
+Setting up a VPN can be complicated at times but AWS tries to simplify the process as much as they can. Below you'll see the steps to create a highly available site-to-site VPN connection with Border Gateway Protocol (BGP) dynamic routing.
 
 ### What will be created
 
@@ -38,23 +38,23 @@ In this example the routers IP's can be found as outputs: `Router1Public` and `R
 ## Creating On-prem Customer Gateways (CGW)
 In this example there are 2 on-premises routers therefore 2 customer gateways are required.
 
-### How do you set up a CGW for Router1?
--Select `Customer Gateways` under `Virtual private Network (VPN)` and create a CGW
--Set the name of the CGW as `ROUTER1` and click `Dynamic` for routing  
--Set BGP ASN to `65016` 
--Set IP Address to Router1PubIP (The public IP for Router1)  
+### How do you set up a CGW for Router1? 
+-Select `Customer Gateways` under `Virtual private Network (VPN)` and create a CGW <br />
+-Set the name of the CGW as `ROUTER1` and click `Dynamic` for routing  <br />
+-Set BGP ASN to `65016` <br />
+-Set IP Address to Router1PubIP (The public IP for Router1)  <br />
 -create `Customer gateway`  
 
 ![selectcustomergateway](https://user-images.githubusercontent.com/62077185/124516464-b2942280-ddaf-11eb-9809-9ba72aaffa1e.JPG)
 
 ** Note: You can set a private BGP ASN in the range of `64512 to 65535` ** 
   
-### How do you set up a CGW for Router2?
-That's right, it's the same as Router1. So just repeat the steps:
--Select `Customer Gateways` under `Virtual private Network (VPN)`  and create a CGW
--Set the name of the CGW as `ROUTER2` and click `Dynamic` for routing  
--Set BGP ASN to `65016` (the same as Router1)
--Set IP Address to Router2PubIP (The public IP for Router2)     
+### How do you set up a CGW for Router2?<br />
+That's right, it's the same as Router1. So just repeat the steps: <br />
+-Select `Customer Gateways` under `Virtual private Network (VPN)`  and create a CGW <br />
+-Set the name of the CGW as `ROUTER2` and click `Dynamic` for routing  <br />
+-Set BGP ASN to `65016` (the same as Router1) <br />
+-Set IP Address to Router2PubIP (The public IP for Router2) 
 -`create Customer gateway`  
 
 ## Is there connectivity?
@@ -65,13 +65,13 @@ It won't work yet...there's still more to do
 Now 2 vpn attachments need to be created for the Transit Gateway (TGW). In essence it's creating 2 vpn connections, 1 for each of the customer gateways in the on-prem environment. Each vpn connection has 2 tunnels for each AWS Endpoint pointing to the on-prem router.
 This step is needed in order to download the config files (for configuring on-prem VPN endpoints)
 
-### Create the VPN Attacments for TGW
+### Create the VPN Attachments for TGW
 
 In AWS, navigate to TGW attachments and create a TGW attachment. For transit gateway ID in the dropdown select the TGW created in the cloudformation stack.
 
 ![createtransattach](https://user-images.githubusercontent.com/62077185/124516484-bc1d8a80-ddaf-11eb-8824-ea7e36ce22f0.JPG)
 
--Attacment type: `VPN`
+-Attachment type: `VPN`
 -`Customer gateway`: `Existing`
 -`Customer gateway ID` : `ROUTER1`
 -`Routing options` : `Dynamic`
@@ -80,7 +80,7 @@ In AWS, navigate to TGW attachments and create a TGW attachment. For transit gat
 
 `Create Transit Gateway Attachment`
 `Transit Gateway ID` : `AWSTGW`
--Attacment type: `VPN`
+-Attachment type: `VPN`
 -`Customer gateway`: `Ex-`Customer gateway ID` : `ROUTER2`
 -`Routing options` : `Dynamic`
 -`Enable Acceleration`
@@ -181,7 +181,7 @@ Once connected run:
 `cd /home/ubuntu/demo_assets/`  
 `nano ipsec.conf`  
 
-This is is the file which configures the IPSEC Tunnel interfaces over which our VPN traffic flows.  
+This the file which configures the IPSEC Tunnel interfaces over which our VPN traffic flows.  
 As we are connected to Router 2 - This configures the ones for ROUTER2 -> BOTH AWS Endpoints  
 
 Replace the following placeholders with the real values in the config file 
@@ -249,7 +249,7 @@ BGP capability is added using `FRR` and that will be installed on the on-prem ro
 ## Install FRR on Router1 (BGP capability)
 Select the EC2 instance named `ROUTER1` and connect via SSM Session Manager
 
-First we will make the `FRR` script executable and run it to install BGP capability.  
+First, we will make the `FRR` script executable and run it to install BGP capability.  
 `sudo bash`  
 `cd /home/ubuntu/demo_assets`   
 `chmod +x ffrouting-install.sh`   
@@ -344,5 +344,5 @@ run `ping IP_ADDRESS_OF_ONPREM-SERVER2`
 
 And it's as easy as that! In a few steps you've created a dynamic VPN connection between your on-premises and AWS environments. Enjoy your connectivity.
 
-Check out the offical documentation for an alternative way of learning https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html
+Check out the official documentation for an alternative way of learning https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html
 
